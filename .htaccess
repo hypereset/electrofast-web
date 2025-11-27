@@ -1,5 +1,4 @@
 DirectoryIndex src/index.php index.php
-
 <IfModule mod_rewrite.c>
     RewriteEngine On
     RewriteRule ^$ src/index.php [L]
