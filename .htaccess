@@ -1,9 +1,0 @@
-DirectoryIndex src/index.php index.php
-<IfModule mod_rewrite.c>
-    RewriteEngine On
-    RewriteRule ^$ src/index.php [L]
-</IfModule>
-<Directory "/var/www/html">
-    AllowOverride All
-    Require all granted
-</Directory>
