@@ -9,6 +9,7 @@ RUN a2enmod rewrite
 # Copiar todo el contenido de la carpeta actual a la raíz de Apache
 COPY . /var/www/html/
 
+
 # Dar permisos al usuario de Apache (www-data) para que pueda leer todo
 RUN chown -R www-data:www-data /var/www/html \
     && chmod -R 755 /var/www/html
