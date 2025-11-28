@@ -1,4 +1,5 @@
 <?php
+ob_start(); // INICIO BUFFER (Vital para limpiar errores silenciosos)
 session_start();
 include 'php/conexion.php';
 
@@ -7,20 +8,28 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['agregar_nuevo'])) {
     $cantidad = intval($_POST['cantidad']);
 
     if (!isset($_SESSION['carrito'])) { $_SESSION['carrito'] = array(); }
+    
     if (isset($_SESSION['carrito'][$id])) {
         $_SESSION['carrito'][$id] += $cantidad;
     } else {
         $_SESSION['carrito'][$id] = $cantidad;
     }
+    
+    // --- RESPUESTA AJAX REPARADA ---
     if (isset($_POST['ajax'])) {
         $total_items = 0;
         foreach($_SESSION['carrito'] as $c) { $total_items += $c; }
+        
+        ob_clean(); // Borra cualquier espacio o error previo
+        header('Content-Type: application/json'); // Asegura que sea JSON puro
         echo json_encode(['status' => 'success', 'total_items' => $total_items]);
         exit;
     }
+    
     header("Location: " . ($_POST['return_url'] ?? "carrito.php"));
     exit;
 }
+
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['action'] == 'update_qty') {
     $id = $_POST['id'];
     $cantidad = intval($_POST['cantidad']);
@@ -32,6 +41,7 @@ if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['action']) && $_POST['a
     header("Location: carrito.php");
     exit;
 }
+
 if (isset($_GET['action'])) {
     if ($_GET['action'] == 'eliminar' && isset($_GET['id'])) {
         unset($_SESSION['carrito'][$_GET['id']]);
@@ -63,7 +73,6 @@ include 'includes/header.php';
         </div>
     <?php else: ?>
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-            
             <div class="lg:col-span-2">
                 <div class="overflow-x-auto bg-base-100 rounded-box shadow border border-base-200">
                     <table class="table">
@@ -109,8 +118,7 @@ include 'includes/header.php';
                                     <form action="carrito.php" method="POST" class="flex justify-center">
                                         <input type="hidden" name="action" value="update_qty">
                                         <input type="hidden" name="id" value="<?php echo $id; ?>">
-                                        <input type="number" name="cantidad" value="<?php echo $cantidad; ?>" min="1" max="<?php echo $prod['stock_actual']; ?>" 
-                                               class="input input-bordered input-sm w-16 text-center font-bold" onchange="this.form.submit()">
+                                        <input type="number" name="cantidad" value="<?php echo $cantidad; ?>" min="1" max="<?php echo $prod['stock_actual']; ?>" class="input input-bordered input-sm w-16 text-center font-bold" onchange="this.form.submit()">
                                     </form>
                                 </td>
                                 <td class="text-right font-display font-bold">
@@ -125,7 +133,6 @@ include 'includes/header.php';
                         </tbody>
                     </table>
                 </div>
-                
                 <div class="flex justify-between mt-4">
                     <a href="carrito.php?action=vaciar" class="btn btn-outline btn-error btn-sm">Vaciar Carrito</a>
                     <a href="catalogo.php" class="btn btn-outline btn-sm">Seguir Comprando</a>
@@ -136,7 +143,6 @@ include 'includes/header.php';
                 <div class="card bg-base-100 shadow-xl border border-base-200 sticky top-24">
                     <div class="card-body">
                         <h2 class="card-title text-lg border-b pb-2 border-base-200">Resumen del Pedido</h2>
-                        
                         <div class="flex justify-between my-2 text-sm">
                             <span class="opacity-70">Subtotal Productos</span>
                             <span class="font-bold">$<?php echo number_format($total_final, 2); ?></span>
