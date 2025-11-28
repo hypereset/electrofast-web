@@ -1,95 +1,70 @@
-</main> <footer class="footer p-10 bg-neutral text-neutral-content mt-auto">
-  <aside>
-    <div class="font-display font-bold text-3xl mb-2 flex items-center gap-2 text-primary">
-        <span class="text-white">Proto</span>Hub
+<?php 
+include 'php/conexion.php'; 
+include 'includes/header.php'; 
+
+// ... (Lógica de búsqueda se mantiene igual) ...
+$busqueda = ""; $filtro_sql = "";
+if (isset($_GET['busqueda']) && !empty($_GET['busqueda'])) {
+    $busqueda = $conn->real_escape_string($_GET['busqueda']);
+    $filtro_sql = "AND (nombre LIKE '%$busqueda%' OR descripcion LIKE '%$busqueda%')";
+}
+
+// --- FUNCIÓN DE RENDERIZADO ---
+function renderCard($row, $esNuevo = false) {
+    $img = (file_exists("img/".$row['imagen_url']) && $row['imagen_url']!='default.jpg') ? "img/".$row['imagen_url'] : "img/default.jpg";
+    ?>
+    
+    <div class="card card-compact bg-base-100 shadow-xl hover:shadow-2xl transition-all border border-base-200 h-full flex flex-col justify-between">
+        <figure class="relative px-4 pt-4 h-40 md:h-48 bg-base-200 flex items-center justify-center rounded-t-2xl shrink-0">
+            <a href="producto.php?id=<?php echo $row['id_producto']; ?>" class="w-full h-full flex items-center justify-center">
+                <img src="<?php echo $img; ?>" class="max-h-full object-contain hover:scale-110 transition-transform" loading="lazy" />
+            </a>
+            <?php if($esNuevo): ?><div class="absolute top-2 right-2 badge badge-secondary font-bold text-xs">NUEVO</div><?php endif; ?>
+        </figure>
+
+        <div class="card-body p-3 md:p-5 flex flex-col flex-grow">
+            <h2 class="card-title text-sm md:text-base font-bold leading-tight">
+                <a href="producto.php?id=<?php echo $row['id_producto']; ?>" class="hover:text-primary"><?php echo $row['nombre']; ?></a>
+            </h2>
+            
+            <div class="card-actions justify-between items-end mt-auto pt-2 border-t border-base-200/50">
+                <div class="flex flex-col">
+                    <span class="text-xs font-bold opacity-70 uppercase">Precio</span>
+                    <span class="text-lg md:text-xl font-black text-primary">$<?php echo $row['precio_unitario']; ?></span>
+                </div>
+
+                <form onsubmit="agregarAlCarritoAjax(this)">
+                    <input type="hidden" name="agregar_nuevo" value="true">
+                    <input type="hidden" name="id_producto" value="<?php echo $row['id_producto']; ?>">
+                    <input type="hidden" name="cantidad" value="1">
+                    <button type="submit" class="btn btn-circle btn-primary btn-sm shadow-md"><i class="fas fa-plus"></i></button>
+                </form>
+            </div>
+        </div>
     </div>
-    <p class="font-sans text-sm opacity-80 max-w-xs">
-      Innovación entregada en minutos.<br/>
-      Tu aliado tecnológico en Coacalco para salvar el semestre.
-    </p>
-    <div class="flex gap-4 mt-4">
-        <a class="link link-hover opacity-60 hover:opacity-100 transition-opacity"><i class="fab fa-facebook fa-xl"></i></a>
-        <a class="link link-hover opacity-60 hover:opacity-100 transition-opacity"><i class="fab fa-instagram fa-xl"></i></a>
-        <a class="link link-hover opacity-60 hover:opacity-100 transition-opacity"><i class="fab fa-tiktok fa-xl"></i></a>
-    </div>
-  </aside> 
+    <?php
+}
+?>
 
-  <nav>
-    <h6 class="footer-title opacity-100 text-white">Tienda</h6> 
-    <a href="catalogo.php" class="link link-hover">Catálogo Completo</a>
-    <a href="paquetes.php" class="link link-hover ">Kits Escolares</a>
-    <a href="#" class="link link-hover">Novedades</a>
-  </nav> 
+<div class="container mx-auto px-4 py-8 max-w-7xl">
+    <?php if (empty($filtro_sql)): ?>
+        <div class="hero min-h-[200px] rounded-box mb-8 bg-base-200"><div class="hero-content text-center"><h1 class="text-4xl font-black">¡Salva tu semestre!</h1></div></div>
+        
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <?php
+            $res = $conn->query("SELECT * FROM productos WHERE estado='activo' LIMIT 8");
+            while($row = $res->fetch_assoc()) { renderCard($row); }
+            ?>
+        </div>
+    <?php else: ?>
+        <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+            <?php
+            $res = $conn->query("SELECT * FROM productos WHERE estado='activo' $filtro_sql LIMIT 20");
+            if($res->num_rows > 0) { while($row = $res->fetch_assoc()) renderCard($row); }
+            else { echo "No hay resultados."; }
+            ?>
+        </div>
+    <?php endif; ?>
+</div>
 
-  <nav>
-    <h6 class="footer-title opacity-100 text-white">Ayuda</h6> 
-    <a href="faq.php" class="link link-hover ">Preguntas Frecuentes</a>
-    <a href="nosotros.php" class="link link-hover">¿Quiénes somos?</a>
-    <a href="terminos.php" class="link link-hover">Términos y Condiciones</a>
-    <a href="#" class="link link-hover">Política de Devoluciones</a>
-  </nav>
-
-  <nav>
-    <h6 class="footer-title opacity-100 text-white">Contacto</h6>  
-    <span class="text-sm opacity-70 mb-2">Dir. Blvd. de las Rosas No.45, Coacalco</span>
-    <span class="text-sm opacity-70 mb-1">Lunes a Viernes: 9am - 7pm</span>
-    <span class="text-sm opacity-70 mb-1">Sabado a Domingo: 10am - 5pm</span>
-   
-    <a href="https://wa.me/5215611676809?text=Hola%20ProtoHub." target="_blank" class="btn btn-success btn-sm text-white shadow-lg w-full">
-        <i class="fab fa-whatsapp text-lg mr-1"></i> WhatsApp
-    </a>
-    <a href="mailto:contacto@protohub.com" class="link link-hover text-sm mt-2">contacto@protohub.com</a>
-  </nav>
-</footer>
-
-<script>
-document.addEventListener('DOMContentLoaded', function() {
-    const forms = document.querySelectorAll('form[action="carrito.php"]');
-    forms.forEach(form => {
-        form.addEventListener('submit', function(e) {
-            if (form.querySelector('input[name="agregar_nuevo"]')) {
-                e.preventDefault();
-                const formData = new FormData(form);
-                formData.append('ajax', 'true');
-
-                fetch('carrito.php', { method: 'POST', body: formData })
-                .then(response => response.json())
-                .then(data => {
-                    if (data.status === 'success') {
-                        
-                        // 1. Actualizar Badges Rojos (Iconos)
-                        const badges = document.querySelectorAll('.cart-badge-count');
-                        badges.forEach(b => {
-                            b.innerText = data.total_items;
-                            b.classList.remove('hidden');
-                            b.classList.add('animate-bounce');
-                            setTimeout(() => b.classList.remove('animate-bounce'), 1000);
-                        });
-
-                        // 2. Actualizar Texto Grande (Dropdown)
-                        const textCounts = document.querySelectorAll('.cart-item-count-text');
-                        textCounts.forEach(span => {
-                            span.innerText = data.total_items + " Items";
-                        });
-                        
-                        // 3. Alerta
-                        const Toast = Swal.mixin({
-                            toast: true, position: 'top-end', showConfirmButton: false, 
-                            timer: 2000, timerProgressBar: false,
-                            didOpen: (toast) => {
-                                toast.addEventListener('mouseenter', Swal.stopTimer)
-                                toast.addEventListener('mouseleave', Swal.resumeTimer)
-                            }
-                        });
-                        Toast.fire({ icon: 'success', title: '¡Agregado al carrito!' });
-                    }
-                })
-                .catch(error => console.error('Error:', error));
-            }
-        });
-    });
-});
-</script>
-
-</body>
-</html>
+<?php include 'includes/footer.php'; ?>
