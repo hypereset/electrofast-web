@@ -2,9 +2,11 @@
 if (session_status() === PHP_SESSION_NONE) { session_start(); }
 include_once __DIR__ . '/../php/conexion.php'; 
 
+// 1. Contar Carrito
 $num_items = 0;
 if(isset($_SESSION['carrito'])){ foreach($_SESSION['carrito'] as $cant){ $num_items += $cant; } }
 
+// 2. Puntos
 $puntos_usuario = 0;
 if(isset($_SESSION['id_usuario']) && isset($conn)){
     $id_user = $_SESSION['id_usuario'];
@@ -12,6 +14,7 @@ if(isset($_SESSION['id_usuario']) && isset($conn)){
     if($res_pts && $res_pts->num_rows > 0){ $puntos_usuario = $res_pts->fetch_assoc()['puntos']; }
 }
 
+// 3. Widget Pedido
 $pedido_activo = null;
 $id_pedido_activo = 0;
 if(isset($_SESSION['id_usuario']) && isset($conn)){
@@ -28,13 +31,14 @@ if(isset($_SESSION['id_usuario']) && isset($conn)){
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>ProtoHub - Componentes</title>
+    <title>ProtoHub</title>
     
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&family=Sora:wght@400;600;700&display=swap" rel="stylesheet">
     
- <link rel="stylesheet" href="css/estilos_final.css?v=<?php echo time(); ?>">
+    <link rel="stylesheet" href="css/estilos_final.css?v=<?php echo time(); ?>">
+
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
@@ -42,7 +46,6 @@ if(isset($_SESSION['id_usuario']) && isset($conn)){
         const savedTheme = localStorage.getItem('tema') || 'corporate';
         document.documentElement.setAttribute('data-theme', savedTheme);
     </script>
-    
     <style>
         .bell-ringing { animation: bellShake 2s infinite; color: #ff6f00 !important; }
         @keyframes bellShake { 0% { transform: rotate(0); } 10% { transform: rotate(10deg); } 20% { transform: rotate(-10deg); } 30% { transform: rotate(6deg); } 40% { transform: rotate(-6deg); } 50% { transform: rotate(0); } }
@@ -57,32 +60,24 @@ if(isset($_SESSION['id_usuario']) && isset($conn)){
         $es_tienda = ($pedido_activo['tipo_entrega'] == 'tienda');
         $txt_status = ucfirst(str_replace('_', ' ', $pedido_activo['estatus_pedido']));
         $badge_cls = "badge-warning";
-        if ($es_tienda && $pedido_activo['estatus_pedido'] == 'en_camino') {
-            $txt_status = '¡Listo para recoger!';
-            $badge_cls = 'badge-success text-white animate-pulse';
-        }
+        if ($es_tienda && $pedido_activo['estatus_pedido'] == 'en_camino') { $txt_status = '¡Listo para recoger!'; $badge_cls = 'badge-success text-white animate-pulse'; }
     ?>
     <div id="widgetDiDi" class="fixed bottom-5 right-5 z-[9999] card w-80 bg-base-100 shadow-2xl border-l-8 border-primary transform hover:-translate-y-1 transition-all duration-300">
         <div class="card-body p-4">
             <div class="flex justify-between items-start">
                 <div>
-                    <h3 class="font-bold text-primary flex items-center gap-2">
-                        <i class="fas <?php echo $es_tienda ? 'fa-store' : 'fa-motorcycle'; ?>"></i>
-                        <?php echo $es_tienda ? 'Recolección' : 'En Curso'; ?>
-                    </h3>
+                    <h3 class="font-bold text-primary flex items-center gap-2"><i class="fas <?php echo $es_tienda ? 'fa-store' : 'fa-motorcycle'; ?>"></i> <?php echo $es_tienda ? 'Recolección' : 'En Curso'; ?></h3>
                     <p class="text-xs opacity-60">Orden #<?php echo str_pad($pedido_activo['id_pedido'], 4, "0", STR_PAD_LEFT); ?></p>
                 </div>
                 <div class="badge <?php echo $badge_cls; ?> font-bold text-xs"><?php echo $txt_status; ?></div>
             </div>
             <progress class="progress progress-primary w-full mt-2" value="70" max="100"></progress>
-            <div class="card-actions justify-end mt-2">
-                <a href="mis_pedidos.php" class="btn btn-xs btn-outline btn-primary w-full">Ver Detalles</a>
-            </div>
+            <div class="card-actions justify-end mt-2"><a href="mis_pedidos.php" class="btn btn-xs btn-outline btn-primary w-full">Ver Detalles</a></div>
         </div>
     </div>
 <?php endif; ?>
 
-<div class="navbar bg-base-100 shadow-md sticky top-0 z-50 px-4 border-b border-base-300">
+<div class="navbar bg-base-100 shadow-md sticky top-0 z-50 px-4 border-b border-base-300 h-16">
   <div class="navbar-start w-auto lg:w-1/2">
     <div class="dropdown">
       <div tabindex="0" role="button" class="btn btn-ghost lg:hidden"><i class="fas fa-bars text-lg"></i></div>
@@ -92,8 +87,7 @@ if(isset($_SESSION['id_usuario']) && isset($conn)){
       </ul>
     </div>
     <a href="index.php" class="btn btn-ghost text-xl font-display font-bold tracking-tight px-2">
-        <?php if(file_exists("img/logo.png")) { echo '<img src="img/logo.png" class="h-9 w-auto mr-1 object-contain">'; } 
-              else { echo '<i class="fas fa-microchip text-primary text-2xl mr-2"></i>'; } ?>
+        <?php if(file_exists("img/logo.png")) { echo '<img src="img/logo.png" class="h-9 w-auto mr-1 object-contain">'; } else { echo '<i class="fas fa-microchip text-primary text-2xl mr-2"></i>'; } ?>
         <span class="text-primary">Proto</span>Hub
     </a>
   </div>
@@ -120,9 +114,7 @@ if(isset($_SESSION['id_usuario']) && isset($conn)){
                     <span id="notifBadge" class="badge badge-xs badge-error indicator-item hidden"></span>
                 </div>
             </div>
-            <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-80" id="listaNotificaciones">
-                <li><a class="text-center opacity-50">Cargando...</a></li>
-            </ul>
+            <ul tabindex="0" class="dropdown-content z-[1] menu p-2 shadow bg-base-100 rounded-box w-80" id="listaNotificaciones"><li><a class="text-center opacity-50">Cargando...</a></li></ul>
         </div>
 
         <div class="dropdown dropdown-end">

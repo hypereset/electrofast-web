@@ -2,7 +2,7 @@
 include 'php/conexion.php'; 
 include 'includes/header.php'; 
 
-// Lógica de Búsqueda
+// --- LÓGICA DE BÚSQUEDA ---
 $busqueda = "";
 $estamos_buscando = false;
 $filtro_sql = "";
@@ -17,8 +17,9 @@ if (isset($_GET['busqueda']) && !empty($_GET['busqueda'])) {
     $mensaje_busqueda = "<div class='mb-6'><a href='index.php' class='btn btn-sm btn-outline'>Limpiar búsqueda</a></div>";
 }
 
-// --- FUNCIÓN DE RENDERIZADO (Optimizada) ---
+// --- FUNCIÓN DE RENDERIZADO DE TARJETAS ---
 function renderCard($row, $esNuevo = false) {
+    // Lógica de imagen
     $ruta_local = "img/" . $row['imagen_url'];
     if ($row['imagen_url'] != 'default.jpg' && file_exists($ruta_local)) { 
         $img_final = $ruta_local; 
@@ -29,7 +30,7 @@ function renderCard($row, $esNuevo = false) {
     }
     ?>
     
-    <div class="card card-compact bg-base-100 shadow-xl hover:shadow-2xl transition-all duration-300 border border-base-200 h-full flex flex-col justify-between">
+    <div class="card card-compact bg-base-100 shadow-xl hover:shadow-2xl transition-all duration-300 border border-base-200 card-slider h-full flex flex-col justify-between">
         
         <figure class="relative px-4 pt-4 h-40 md:h-48 bg-base-200 flex items-center justify-center overflow-hidden rounded-t-2xl shrink-0">
             <a href="producto.php?id=<?php echo $row['id_producto']; ?>" class="w-full h-full flex items-center justify-center">
@@ -48,8 +49,9 @@ function renderCard($row, $esNuevo = false) {
 
         <div class="card-body p-3 md:p-5 flex flex-col flex-grow">
             
-            <h2 class="card-title text-sm md:text-base font-display font-bold leading-tight block md:whitespace-normal md:line-clamp-2 md:h-10 break-words">
-                <a href="producto.php?id=<?php echo $row['id_producto']; ?>" class="hover:text-primary transition-colors" title="<?php echo $row['nombre']; ?>">
+            <h2 class="card-title font-display font-bold leading-tight text-base-content mb-1 block" 
+                style="font-size: clamp(0.85rem, 3.5vw, 1.125rem); word-break: break-word; hyphens: auto;">
+                <a href="producto.php?id=<?php echo $row['id_producto']; ?>" class="hover:text-primary transition-colors">
                     <?php echo $row['nombre']; ?>
                 </a>
             </h2>
@@ -103,14 +105,14 @@ function renderCard($row, $esNuevo = false) {
             </div>
         </div>
 
-        <div id="slider1" class="flex flex-nowrap gap-4 md:gap-6 overflow-x-auto pb-8 snap-x scrollbar-hide scroll-smooth px-1">
+        <div id="slider1" class="flex gap-4 md:gap-6 overflow-x-auto pb-8 snap-x scrollbar-hide scroll-smooth px-1">
             <?php
             $sql_top = "SELECT p.*, COALESCE(SUM(d.cantidad), 0) as total_vendido FROM productos p LEFT JOIN detalle_pedido d ON p.id_producto = d.id_producto WHERE p.estado = 'activo' AND p.stock_actual > 0 GROUP BY p.id_producto ORDER BY total_vendido DESC, p.id_producto ASC LIMIT 12";
             $res_top = $conn->query($sql_top);
             if ($res_top && $res_top->num_rows > 0) {
                 while($row = $res_top->fetch_assoc()) { 
-                    // AQUI ESTA EL TRUCO: flex-none y width fijo
-                    echo '<div class="flex-none w-[160px] md:w-[260px] snap-start">'; 
+                    // Ancho fijo para mantener tarjetas alineadas
+                    echo '<div class="min-w-[160px] max-w-[160px] md:min-w-[260px] md:max-w-[260px] snap-start flex-none h-auto flex">'; 
                     renderCard($row); 
                     echo '</div>';
                 }
@@ -128,13 +130,13 @@ function renderCard($row, $esNuevo = false) {
             </div>
         </div>
 
-        <div id="slider2" class="flex flex-nowrap gap-4 md:gap-6 overflow-x-auto pb-8 snap-x scrollbar-hide scroll-smooth px-1">
+        <div id="slider2" class="flex gap-4 md:gap-6 overflow-x-auto pb-8 snap-x scrollbar-hide scroll-smooth px-1">
             <?php
             $sql_new = "SELECT * FROM productos WHERE estado = 'activo' AND stock_actual > 0 ORDER BY id_producto DESC LIMIT 12";
             $res_new = $conn->query($sql_new);
             if ($res_new && $res_new->num_rows > 0) {
                 while($row = $res_new->fetch_assoc()) { 
-                    echo '<div class="flex-none w-[160px] md:w-[260px] snap-start">'; 
+                    echo '<div class="min-w-[160px] max-w-[160px] md:min-w-[260px] md:max-w-[260px] snap-start flex-none h-auto flex">'; 
                     renderCard($row, true); 
                     echo '</div>';
                 }
