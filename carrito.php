@@ -3,6 +3,9 @@ ob_start(); // 1. Iniciar almacenamiento en búfer (Vital)
 session_start();
 include 'php/conexion.php'; // Ruta en raíz
 
+// CONFIGURACIÓN DE NEGOCIO
+$minimo_compra = 50.00; // Monto mínimo en pesos
+
 // --- LÓGICA: AGREGAR AL CARRITO ---
 if ($_SERVER['REQUEST_METHOD'] == 'POST' && isset($_POST['agregar_nuevo'])) {
     $id = $_POST['id_producto'];
@@ -85,7 +88,9 @@ include 'includes/header.php';
                                 $precio = ($cantidad >= 5) ? $prod['precio_mayoreo'] : $prod['precio_unitario'];
                                 $subtotal = $precio * $cantidad;
                                 $total_final += $subtotal;
-                                $img = (file_exists("img/".$prod['imagen_url']) && $prod['imagen_url']!='default.jpg') ? "img/".$prod['imagen_url'] : "img/default.jpg";
+                                // Imagen segura
+                                $ruta_img = "img/" . $prod['imagen_url'];
+                                $img = ($prod['imagen_url'] != 'default.jpg' && file_exists($ruta_img)) ? $ruta_img : ((file_exists("img/default.jpg")) ? "img/default.jpg" : "https://via.placeholder.com/80");
                         ?>
                         <tr class="hover">
                             <td>
@@ -113,12 +118,48 @@ include 'includes/header.php';
                 <div class="card bg-base-100 shadow-xl border border-base-200 sticky top-24">
                     <div class="card-body p-6">
                         <h2 class="card-title text-xl border-b pb-3 mb-4 border-base-200">Resumen</h2>
-                        <div class="flex justify-between mb-2 text-sm"><span class="opacity-70">Subtotal</span><span class="font-bold">$<?php echo number_format($total_final, 2); ?></span></div>
-                        <div class="divider my-2"></div>
-                        <div class="flex justify-between items-end mb-6"><span class="font-bold text-lg">Total</span><span class="font-black text-4xl text-primary">$<?php echo number_format($total_final, 2); ?></span></div>
                         
-                        <?php $link = isset($_SESSION['id_usuario']) ? 'checkout.php' : 'login.php?redirect=checkout'; ?>
-                        <a href="<?php echo $link; ?>" class="btn btn-primary btn-block shadow-lg text-lg font-bold">PAGAR AHORA <i class="fas fa-arrow-right ml-2"></i></a>
+                        <div class="flex justify-between mb-2 text-sm"><span class="opacity-70">Subtotal</span><span class="font-bold">$<?php echo number_format($total_final, 2); ?></span></div>
+                        
+                        <?php 
+                            $falta = $minimo_compra - $total_final;
+                            $cumple_minimo = ($total_final >= $minimo_compra);
+                        ?>
+
+                        <?php if (!$cumple_minimo): ?>
+                            <div class="alert alert-warning text-xs shadow-sm my-2">
+                                <i class="fas fa-exclamation-triangle"></i>
+                                <span>Mínimo de compra: <strong>$<?php echo number_format($minimo_compra, 2); ?></strong><br>Agrega <strong>$<?php echo number_format($falta, 2); ?></strong> más.</span>
+                            </div>
+                            <progress class="progress progress-warning w-full" value="<?php echo $total_final; ?>" max="<?php echo $minimo_compra; ?>"></progress>
+                        <?php else: ?>
+                            <div class="alert alert-success text-xs shadow-sm my-2 text-white">
+                                <i class="fas fa-check-circle"></i>
+                                <span>¡Mínimo alcanzado!</span>
+                            </div>
+                        <?php endif; ?>
+
+                        <div class="divider my-2"></div>
+                        <div class="flex justify-between items-end mb-6">
+                            <span class="font-bold text-lg">Total</span>
+                            <span class="font-black text-4xl text-primary">$<?php echo number_format($total_final, 2); ?></span>
+                        </div>
+                        
+                        <?php 
+                            $link = isset($_SESSION['id_usuario']) ? 'checkout.php' : 'login.php?redirect=checkout'; 
+                            // Si no cumple el mínimo, desactivamos el botón
+                            $btn_state = $cumple_minimo ? '' : 'btn-disabled opacity-50 cursor-not-allowed';
+                            $btn_href = $cumple_minimo ? $link : '#';
+                        ?>
+                        
+                        <a href="<?php echo $btn_href; ?>" class="btn btn-primary btn-block shadow-lg text-lg font-bold <?php echo $btn_state; ?>">
+                            PAGAR AHORA <i class="fas fa-arrow-right ml-2"></i>
+                        </a>
+                        
+                        <?php if (!$cumple_minimo): ?>
+                            <p class="text-center text-xs mt-2 opacity-50">Agrega más productos para activar el pago</p>
+                        <?php endif; ?>
+
                     </div>
                 </div>
             </div>

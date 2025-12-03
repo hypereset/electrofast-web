@@ -30,10 +30,10 @@ function renderCardCatalogo($row) {
         </figure>
         <div class="card-body">
             <h2 class="card-title text-sm font-display leading-tight h-10 overflow-hidden">
-                <a href="producto.php?id=<?php echo $row['id_producto']; ?>" class="hover:text-primary transition-colors">
-                    <?php echo $row['nombre']; ?>
-                </a>
-            </h2>
+    <a href="producto.php?id=<?php echo $row['id_producto']; ?>" class="hover:text-primary transition-colors line-clamp-2">
+        <?php echo $row['nombre']; ?>
+    </a>
+</h2>
             <div class="card-actions justify-between items-end mt-2">
                 <div class="flex flex-col">
                     <span class="text-xs opacity-70 font-bold">Precio</span>

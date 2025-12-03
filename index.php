@@ -49,12 +49,11 @@ function renderCard($row, $esNuevo = false) {
 
         <div class="card-body p-3 md:p-5 flex flex-col flex-grow">
             
-            <h2 class="card-title font-display font-bold leading-tight text-base-content mb-1 block" 
-                style="font-size: clamp(0.85rem, 3.5vw, 1.125rem); word-break: break-word; hyphens: auto;">
-                <a href="producto.php?id=<?php echo $row['id_producto']; ?>" class="hover:text-primary transition-colors">
-                    <?php echo $row['nombre']; ?>
-                </a>
-            </h2>
+            <h2 class="card-title font-display font-bold leading-tight text-base-content mb-1 block h-12 overflow-hidden">
+    <a href="producto.php?id=<?php echo $row['id_producto']; ?>" class="hover:text-primary transition-colors line-clamp-2 text-sm md:text-base">
+        <?php echo $row['nombre']; ?>
+    </a>
+</h2>
             
             <div class="card-actions justify-between items-end mt-auto pt-2 border-t border-base-200/50">
                 <div class="flex flex-col">

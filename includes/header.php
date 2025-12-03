@@ -1,5 +1,6 @@
 <?php
 if (session_status() === PHP_SESSION_NONE) { session_start(); }
+// Aseguramos que la ruta sea relativa desde la raíz, ya que este archivo se incluye en index.php
 include_once __DIR__ . '/../php/conexion.php'; 
 
 // 1. Contar Carrito
@@ -43,9 +44,14 @@ if(isset($_SESSION['id_usuario']) && isset($conn)){
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css">
     
     <script>
-        const savedTheme = localStorage.getItem('tema') || 'corporate';
-        document.documentElement.setAttribute('data-theme', savedTheme);
+        (function() {
+            const savedTheme = localStorage.getItem('tema');
+            const systemPrefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches;
+            const themeToApply = savedTheme || (systemPrefersDark ? 'night' : 'corporate');
+            document.documentElement.setAttribute('data-theme', themeToApply);
+        })();
     </script>
+
     <style>
         .bell-ringing { animation: bellShake 2s infinite; color: #ff6f00 !important; }
         @keyframes bellShake { 0% { transform: rotate(0); } 10% { transform: rotate(10deg); } 20% { transform: rotate(-10deg); } 30% { transform: rotate(6deg); } 40% { transform: rotate(-6deg); } 50% { transform: rotate(0); } }
@@ -84,8 +90,10 @@ if(isset($_SESSION['id_usuario']) && isset($conn)){
       <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
         <li><a href="index.php">Inicio</a></li>
         <li><a>Categorías</a><ul class="p-2"><li><a href="catalogo.php">Ver Todo</a></li></ul></li>
+        <li><a id="btnTemaMovil"><i class="fas fa-adjust"></i> Cambiar Tema</a></li>
       </ul>
     </div>
+    
     <a href="index.php" class="btn btn-ghost text-xl font-display font-bold tracking-tight px-2">
         <?php if(file_exists("img/logo.png")) { echo '<img src="img/logo.png" class="h-9 w-auto mr-1 object-contain">'; } else { echo '<i class="fas fa-microchip text-primary text-2xl mr-2"></i>'; } ?>
         <span class="text-primary">Proto</span>Hub
@@ -100,7 +108,7 @@ if(isset($_SESSION['id_usuario']) && isset($conn)){
   </div>
 
   <div class="navbar-end gap-2 w-auto lg:w-1/2">
-    <label class="swap swap-rotate btn btn-ghost btn-circle btn-sm text-primary">
+    <label class="swap swap-rotate btn btn-ghost btn-circle btn-sm text-primary hidden lg:inline-grid">
       <input type="checkbox" id="themeToggle" />
       <i class="swap-on fas fa-sun text-lg"></i>
       <i class="swap-off fas fa-moon text-lg"></i>
@@ -157,17 +165,39 @@ if(isset($_SESSION['id_usuario']) && isset($conn)){
 </div>
 
 <script>
-    const toggle = document.getElementById('themeToggle');
-    const html = document.querySelector('html');
-    const currentTheme = localStorage.getItem('tema') || 'corporate';
-    toggle.checked = currentTheme === 'night';
-    html.setAttribute('data-theme', currentTheme);
-    toggle.addEventListener('change', function() {
-        const newTheme = this.checked ? 'night' : 'corporate';
+    // --- LÓGICA DE TEMA UNIFICADA ---
+    const toggleDesktop = document.getElementById('themeToggle');
+    const btnMovil = document.getElementById('btnTemaMovil');
+    const html = document.documentElement;
+
+    // Verificar tema actual (ya seteado por el script del head)
+    const currentTheme = html.getAttribute('data-theme');
+    if(toggleDesktop) toggleDesktop.checked = (currentTheme === 'night');
+
+    function switchTheme(isDark) {
+        const newTheme = isDark ? 'night' : 'corporate';
         html.setAttribute('data-theme', newTheme);
         localStorage.setItem('tema', newTheme);
-    });
+        if(toggleDesktop) toggleDesktop.checked = isDark;
+    }
 
+    // Listener Desktop
+    if(toggleDesktop) {
+        toggleDesktop.addEventListener('change', function() {
+            switchTheme(this.checked);
+        });
+    }
+
+    // Listener Móvil
+    if(btnMovil) {
+        btnMovil.addEventListener('click', function() {
+            const current = html.getAttribute('data-theme');
+            const isDark = (current === 'corporate'); // Si es corporate, pasamos a oscuro
+            switchTheme(isDark);
+        });
+    }
+
+    // --- LÓGICA DE NOTIFICACIONES (Solo si hay sesión) ---
     <?php if(isset($_SESSION['id_usuario'])): ?>
     let historialNotis = new Set();
     let ordenActivaID = <?php echo $id_pedido_activo; ?>;
