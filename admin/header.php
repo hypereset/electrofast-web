@@ -74,6 +74,8 @@ $es_admin = ($_SESSION['rol'] == 1);
         <li><a href="pedidos.php" class="nav-link"><i class="fas fa-box-open" style="min-width: 25px;"></i> <span class="ms-2">Pedidos</span></a></li>
         <li><a href="productos.php" class="nav-link"><i class="fas fa-microchip" style="min-width: 25px;"></i> <span class="ms-2">Productos</span></a></li>
         <li><a href="reportes.php" class="nav-link"><i class="fas fa-chart-line" style="min-width: 25px;"></i> <span class="ms-2">Reportes</span></a></li>
+        <li><a href="solicitudes.php" class="nav-link"><i class="fa-solid fa-envelope-open" style="min-width: 25px;"></i> <span class="ms-2">Solicitudes</span></a></li>
+        
         <?php if($es_admin): ?>
             <li><a href="finanzas.php" class="nav-link"><i class="fas fa-wallet" style="min-width: 25px;"></i> <span class="ms-2">Finanzas</span></a></li>
             <li><a href="usuarios.php" class="nav-link"><i class="fas fa-users-cog" style="min-width: 25px;"></i> <span class="ms-2">Personal</span></a></li>

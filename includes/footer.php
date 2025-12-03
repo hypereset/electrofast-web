@@ -22,6 +22,7 @@
     <a href="catalogo.php" class="link link-hover py-1">Catálogo Completo</a>
     <a href="paquetes.php" class="link link-hover py-1">Kits Escolares</a>
     <a href="#" class="link link-hover py-1">Novedades</a>
+    <li><a href="solicitar_producto.php" class="link link-hover text-warning font-bold">Solicitar Producto Nuevo</a></li>
   </nav> 
 
   <nav class="flex flex-col gap-2 w-full">
