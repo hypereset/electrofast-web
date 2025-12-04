@@ -1,6 +1,5 @@
 <?php
 if (session_status() === PHP_SESSION_NONE) { session_start(); }
-// Aseguramos ruta relativa correcta para incluir desde subcarpetas
 include_once __DIR__ . '/../php/conexion.php'; 
 
 // 1. Contar Carrito
@@ -84,7 +83,7 @@ if(isset($_SESSION['id_usuario']) && isset($conn)){
     </div>
 <?php endif; ?>
 
-<div class="navbar bg-base-100 shadow-md sticky top-0 z-50 px-2 border-b border-base-300 h-16">
+<div class="navbar bg-base-100 shadow-md sticky top-0 z-50 px-2 border-b border-base-300 h-16 justify-between">
   
   <div class="navbar-start flex items-center gap-1 w-auto lg:w-1/2">
     
@@ -99,7 +98,6 @@ if(isset($_SESSION['id_usuario']) && isset($conn)){
     
     <a href="index.php" class="flex items-center hover:opacity-80 transition-opacity ml-1">
         <?php if(file_exists("img/logo.png")) { 
-            // CAMBIO AQUÍ: h-6 (24px) en móvil, h-10 (40px) en PC
             echo '<img src="img/logo.png" class="h-6 md:h-10 w-auto object-contain" alt="Logo">'; 
         } else { 
             echo '<i class="fas fa-microchip text-primary text-2xl md:text-3xl"></i>'; 
@@ -178,7 +176,6 @@ if(isset($_SESSION['id_usuario']) && isset($conn)){
 </div>
 
 <script>
-    // --- LÓGICA DE TEMA ---
     const toggleDesktop = document.getElementById('themeToggle');
     const btnMovil = document.getElementById('btnTemaMovil');
     const html = document.documentElement;
@@ -197,7 +194,6 @@ if(isset($_SESSION['id_usuario']) && isset($conn)){
         switchTheme(current === 'corporate');
     });
 
-    // --- NOTIFICACIONES ---
     <?php if(isset($_SESSION['id_usuario'])): ?>
     let historialNotis = new Set();
     let ordenActivaID = <?php echo $id_pedido_activo; ?>;
