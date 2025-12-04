@@ -1,6 +1,6 @@
 <?php
 if (session_status() === PHP_SESSION_NONE) { session_start(); }
-// Aseguramos que la ruta sea relativa desde la raíz, ya que este archivo se incluye en index.php
+// Aseguramos ruta relativa correcta
 include_once __DIR__ . '/../php/conexion.php'; 
 
 // 1. Contar Carrito
@@ -15,7 +15,7 @@ if(isset($_SESSION['id_usuario']) && isset($conn)){
     if($res_pts && $res_pts->num_rows > 0){ $puntos_usuario = $res_pts->fetch_assoc()['puntos']; }
 }
 
-// 3. Widget Pedido
+// 3. Widget Pedido (Rastreo)
 $pedido_activo = null;
 $id_pedido_activo = 0;
 if(isset($_SESSION['id_usuario']) && isset($conn)){
@@ -57,6 +57,8 @@ if(isset($_SESSION['id_usuario']) && isset($conn)){
         @keyframes bellShake { 0% { transform: rotate(0); } 10% { transform: rotate(10deg); } 20% { transform: rotate(-10deg); } 30% { transform: rotate(6deg); } 40% { transform: rotate(-6deg); } 50% { transform: rotate(0); } }
         .swal2-container { z-index: 99999 !important; }
         #widgetDiDi { z-index: 99990 !important; }
+        /* Ajuste fino para móviles */
+        @media (max-width: 640px) { .navbar { padding-left: 0.5rem; padding-right: 0.5rem; } }
     </style>
 </head>
 <body class="bg-base-200 min-h-screen flex flex-col font-sans text-base-content">
@@ -83,10 +85,12 @@ if(isset($_SESSION['id_usuario']) && isset($conn)){
     </div>
 <?php endif; ?>
 
-<div class="navbar bg-base-100 shadow-md sticky top-0 z-50 px-4 border-b border-base-300 h-16">
-  <div class="navbar-start w-auto lg:w-1/2">
+<div class="navbar bg-base-100 shadow-md sticky top-0 z-50 px-2 lg:px-4 border-b border-base-300 h-16">
+  
+  <div class="navbar-start w-auto lg:w-1/2 flex items-center">
+    
     <div class="dropdown">
-      <div tabindex="0" role="button" class="btn btn-ghost lg:hidden"><i class="fas fa-bars text-lg"></i></div>
+      <div tabindex="0" role="button" class="btn btn-ghost lg:hidden px-2"><i class="fas fa-bars text-xl"></i></div>
       <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
         <li><a href="index.php">Inicio</a></li>
         <li><a>Categorías</a><ul class="p-2"><li><a href="catalogo.php">Ver Todo</a></li></ul></li>
@@ -94,9 +98,10 @@ if(isset($_SESSION['id_usuario']) && isset($conn)){
       </ul>
     </div>
     
-    <a href="index.php" class="btn btn-ghost text-xl font-display font-bold tracking-tight px-2">
-        <?php if(file_exists("img/logo.png")) { echo '<img src="img/logo.png" class="h-9 w-auto mr-1 object-contain">'; } else { echo '<i class="fas fa-microchip text-primary text-2xl mr-2"></i>'; } ?>
-        <span class="text-primary">Proto</span>Hub
+    <a href="index.php" class="btn btn-ghost text-xl font-display font-bold tracking-tight px-1 lg:px-2">
+        <?php if(file_exists("img/logo.png")) { echo '<img src="img/logo.png" class="h-8 w-auto mr-1 object-contain">'; } else { echo '<i class="fas fa-microchip text-primary text-2xl mr-1"></i>'; } ?>
+        
+        <span class="hidden md:inline"><span class="text-primary">Proto</span>Hub</span>
     </a>
   </div>
 
@@ -107,7 +112,8 @@ if(isset($_SESSION['id_usuario']) && isset($conn)){
     </form>
   </div>
 
-  <div class="navbar-end gap-2 w-auto lg:w-1/2">
+  <div class="navbar-end gap-1 lg:gap-2 w-auto lg:w-1/2 flex justify-end">
+    
     <label class="swap swap-rotate btn btn-ghost btn-circle btn-sm text-primary hidden lg:inline-grid">
       <input type="checkbox" id="themeToggle" />
       <i class="swap-on fas fa-sun text-lg"></i>
@@ -116,7 +122,7 @@ if(isset($_SESSION['id_usuario']) && isset($conn)){
 
     <?php if(isset($_SESSION['id_usuario'])): ?>
         <div class="dropdown dropdown-end">
-            <div tabindex="0" role="button" class="btn btn-ghost btn-circle" id="bellIcon">
+            <div tabindex="0" role="button" class="btn btn-ghost btn-circle btn-sm lg:btn-md" id="bellIcon">
                 <div class="indicator">
                     <i class="fas fa-bell text-lg"></i>
                     <span id="notifBadge" class="badge badge-xs badge-error indicator-item hidden"></span>
@@ -126,17 +132,18 @@ if(isset($_SESSION['id_usuario']) && isset($conn)){
         </div>
 
         <div class="dropdown dropdown-end">
-            <div tabindex="0" role="button" class="btn btn-ghost rounded-btn px-2 flex items-center gap-2">
+            <div tabindex="0" role="button" class="btn btn-ghost rounded-btn px-1 lg:px-2 flex items-center gap-2">
                 <div class="hidden md:flex flex-col items-end mr-1 text-right">
                     <span class="text-xs font-bold text-success">$<?php echo number_format($puntos_usuario, 2); ?> Pts</span>
                     <span class="text-xs opacity-60"><?php echo explode(' ', $_SESSION['nombre_usuario'])[0]; ?></span>
                 </div>
                 <div class="avatar placeholder">
-                    <div class="bg-neutral text-neutral-content rounded-full w-8"><span class="text-xs"><?php echo strtoupper(substr($_SESSION['nombre_usuario'], 0, 2)); ?></span></div>
+                    <div class="bg-neutral text-neutral-content rounded-full w-8 h-8"><span class="text-xs"><?php echo strtoupper(substr($_SESSION['nombre_usuario'], 0, 2)); ?></span></div>
                 </div>
             </div>
             <ul tabindex="0" class="menu menu-sm dropdown-content mt-3 z-[1] p-2 shadow bg-base-100 rounded-box w-52">
-                <li class="md:hidden text-success font-bold px-4 py-2">$<?php echo number_format($puntos_usuario, 2); ?> Pts</li>
+                <li class="md:hidden text-success font-bold px-4 py-2 text-center border-b border-base-200 mb-2">$<?php echo number_format($puntos_usuario, 2); ?> Pts</li>
+                <li class="md:hidden opacity-50 px-4 pb-2 text-xs text-center"><?php echo $_SESSION['nombre_usuario']; ?></li>
                 <?php if($_SESSION['rol'] == 1 || $_SESSION['rol'] == 2): ?><li><a href="admin/index.php" class="text-warning font-bold">Panel Admin</a></li><?php endif; ?>
                 <li><a href="mi_perfil.php">Mi Perfil</a></li>
                 <li><a href="mis_pedidos.php">Mis Pedidos</a></li>
@@ -148,7 +155,7 @@ if(isset($_SESSION['id_usuario']) && isset($conn)){
     <?php endif; ?>
 
     <div class="dropdown dropdown-end">
-        <div tabindex="0" role="button" class="btn btn-ghost btn-circle">
+        <div tabindex="0" role="button" class="btn btn-ghost btn-circle btn-sm lg:btn-md">
             <div class="indicator">
                 <i class="fas fa-shopping-cart text-lg"></i>
                 <span class="badge badge-sm badge-secondary indicator-item cart-badge-count <?php echo ($num_items > 0) ? '' : 'hidden'; ?>"><?php echo $num_items; ?></span>
@@ -170,7 +177,6 @@ if(isset($_SESSION['id_usuario']) && isset($conn)){
     const btnMovil = document.getElementById('btnTemaMovil');
     const html = document.documentElement;
 
-    // Verificar tema actual (ya seteado por el script del head)
     const currentTheme = html.getAttribute('data-theme');
     if(toggleDesktop) toggleDesktop.checked = (currentTheme === 'night');
 
@@ -181,23 +187,18 @@ if(isset($_SESSION['id_usuario']) && isset($conn)){
         if(toggleDesktop) toggleDesktop.checked = isDark;
     }
 
-    // Listener Desktop
     if(toggleDesktop) {
-        toggleDesktop.addEventListener('change', function() {
-            switchTheme(this.checked);
-        });
+        toggleDesktop.addEventListener('change', function() { switchTheme(this.checked); });
     }
 
-    // Listener Móvil
     if(btnMovil) {
         btnMovil.addEventListener('click', function() {
             const current = html.getAttribute('data-theme');
-            const isDark = (current === 'corporate'); // Si es corporate, pasamos a oscuro
-            switchTheme(isDark);
+            switchTheme(current === 'corporate');
         });
     }
 
-    // --- LÓGICA DE NOTIFICACIONES (Solo si hay sesión) ---
+    // --- LÓGICA DE NOTIFICACIONES ---
     <?php if(isset($_SESSION['id_usuario'])): ?>
     let historialNotis = new Set();
     let ordenActivaID = <?php echo $id_pedido_activo; ?>;
