@@ -1,5 +1,6 @@
 <?php
 if (session_status() === PHP_SESSION_NONE) { session_start(); }
+// Aseguramos ruta relativa correcta para incluir desde subcarpetas
 include_once __DIR__ . '/../php/conexion.php'; 
 
 // 1. Contar Carrito
@@ -56,7 +57,6 @@ if(isset($_SESSION['id_usuario']) && isset($conn)){
         @keyframes bellShake { 0% { transform: rotate(0); } 10% { transform: rotate(10deg); } 20% { transform: rotate(-10deg); } 30% { transform: rotate(6deg); } 40% { transform: rotate(-6deg); } 50% { transform: rotate(0); } }
         .swal2-container { z-index: 99999 !important; }
         #widgetDiDi { z-index: 99990 !important; }
-        /* Fix para evitar desbordes en navbar móvil */
         .navbar-start { flex-shrink: 1; min-width: 0; }
     </style>
 </head>
@@ -99,8 +99,8 @@ if(isset($_SESSION['id_usuario']) && isset($conn)){
     
     <a href="index.php" class="flex items-center hover:opacity-80 transition-opacity ml-1">
         <?php if(file_exists("img/logo.png")) { 
-            // AQUÍ ESTÁ EL FIX: h-8 (32px) forzado en móvil, h-10 (40px) en PC
-            echo '<img src="img/logo.png" class="h-8 md:h-10 w-auto object-contain" alt="Logo">'; 
+            // CAMBIO AQUÍ: h-6 (24px) en móvil, h-10 (40px) en PC
+            echo '<img src="img/logo.png" class="h-6 md:h-10 w-auto object-contain" alt="Logo">'; 
         } else { 
             echo '<i class="fas fa-microchip text-primary text-2xl md:text-3xl"></i>'; 
         } ?>
