@@ -48,7 +48,7 @@
     <a href="https://wa.me/5215611676809?text=Hola%20ProtoHub." target="_blank" class="btn btn-success btn-sm text-white shadow-lg w-full mt-2 max-w-[200px] mx-auto md:mx-0">
         <i class="fab fa-whatsapp text-lg mr-1"></i> WhatsApp
     </a>
-    <a href="mailto:contacto@protohub.com" class="link link-hover text-sm mt-2 py-1 break-all">contacto@protohub.com</a>
+    <a href="mailto:contact@protohub.com" class="link link-hover text-sm mt-2 py-1 break-all">contacto@protohub.com</a>
   </nav>
 </footer>
 
